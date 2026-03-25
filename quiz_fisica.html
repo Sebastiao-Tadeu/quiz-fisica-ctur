@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz de Física – Recuperação 1º Bimestre</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#F7F4EE;
+      --paper:#FFFDF9;
+      --ink:#1D1D1D;
+      --muted:#666;
+      --line:rgba(0,0,0,.12);
+      --primary:#185FA5;
+      --primary-dark:#0C447C;
+      --accent:#BA7517;
+      --accent-bg:#FFF3E0;
+      --ok:#EAF3DE;
+      --ok-ink:#27500A;
+      --ok-line:#3B6D11;
+      --err:#FCEBEB;
+      --err-ink:#791F1F;
+      --err-line:#A32D2D;
+      --shadow:0 10px 28px rgba(0,0,0,.07);
+      --radius:16px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      min-height:100vh;
+    }
+    .wrap{max-width:760px;margin:0 auto;padding:28px 16px 60px}
+
+    /* HERO */
+    .hero{
+      background:linear-gradient(135deg,#E9F2FB 0%,#FFF9EF 100%);
+      border:1px solid rgba(24,95,165,.15);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:28px 24px;
+      margin-bottom:20px;
+    }
+    .eyebrow{
+      display:inline-block;font-size:11px;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;
+      color:var(--primary-dark);background:#DCEAF8;
+      padding:5px 10px;border-radius:999px;margin-bottom:12px;
+    }
+    .hero h1{
+      font-family:'DM Serif Display',serif;
+      font-size:clamp(26px,5vw,36px);
+      line-height:1.12;color:var(--primary-dark);margin-bottom:8px;
+    }
+    .hero p{color:#31506A;font-size:15px;line-height:1.6;max-width:55ch}
+    .info-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:10px;margin-top:16px;
+    }
+    .info-pill{
+      background:rgba(255,255,255,.78);border:1px solid rgba(0,0,0,.08);
+      border-radius:12px;padding:10px 13px;font-size:13px;color:#3E4B57;
+    }
+
+    /* ID PANEL */
+    .panel{
+      background:var(--paper);border:1px solid rgba(0,0,0,.08);
+      border-radius:18px;box-shadow:var(--shadow);
+      padding:22px;margin-bottom:18px;
+    }
+    .panel h2{font-size:18px;color:var(--primary-dark);margin-bottom:14px;font-weight:700}
+    .id-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .id-grid.three{grid-template-columns:1fr 1fr 1fr}
+    @media(max-width:560px){.id-grid,.id-grid.three{grid-template-columns:1fr}}
+    label span{display:block;font-size:12px;font-weight:700;color:#3E4B57;margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+    input[type=text],input[type=email]{
+      width:100%;padding:11px 13px;
+      border:1.5px solid rgba(0,0,0,.14);border-radius:12px;
+      background:#fff;font-size:15px;color:#222;font-family:inherit;
+      outline:none;transition:border-color .2s;
+    }
+    input:focus{border-color:var(--primary)}
+    input.error{border-color:var(--err-line);background:var(--err)}
+
+    /* SEC TITLE */
+    .sec-title{
+      margin:26px 0 10px;font-size:14px;font-weight:700;
+      color:var(--primary-dark);letter-spacing:.06em;text-transform:uppercase;
+      display:flex;align-items:center;gap:10px;
+    }
+    .sec-title::before{
+      content:"";width:10px;height:10px;border-radius:50%;
+      background:var(--accent);box-shadow:0 0 0 5px rgba(186,117,23,.15);flex-shrink:0;
+    }
+
+    /* QUESTION CARD */
+    .qcard{
+      background:var(--paper);border:1px solid rgba(0,0,0,.08);
+      border-radius:18px;padding:18px;margin:12px 0;
+      box-shadow:0 6px 16px rgba(0,0,0,.05);
+      transition:transform .15s,box-shadow .15s,border-color .15s;
+    }
+    .qcard:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,0,0,.06)}
+    .qcard.ok{border-color:rgba(59,109,17,.4);background:#FCFEFA}
+    .qcard.err{border-color:rgba(163,45,45,.35);background:#FFFCFC}
+    .qnum{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:32px;height:32px;border-radius:50%;
+      background:#E9F2FB;color:var(--primary-dark);
+      font-weight:700;font-size:14px;margin-bottom:10px;
+    }
+    .qtxt{font-size:16px;line-height:1.65;color:#222;margin-bottom:13px}
+    .tip{
+      font-size:13px;color:#6C522D;background:#FFF7E9;
+      border-left:4px solid var(--accent);
+      padding:10px 12px;border-radius:10px;margin:10px 0 14px;line-height:1.55;
+    }
+    .opts{display:grid;gap:10px}
+    .obtn{
+      width:100%;text-align:left;padding:12px 15px;
+      border-radius:12px;border:1px solid var(--line);
+      background:#FBFAF7;color:#222;font-size:15px;
+      line-height:1.45;cursor:pointer;font-family:inherit;
+      transition:background .15s,border-color .15s,transform .08s;
+    }
+    .obtn:hover{background:#F4F0E9}
+    .obtn:active{transform:scale(.995)}
+    .obtn.ok,.obtn.show-correct{background:var(--ok);border-color:var(--ok-line);color:var(--ok-ink)}
+    .obtn.err{background:var(--err);border-color:var(--err-line);color:var(--err-ink)}
+    .obtn:disabled{cursor:default}
+    .fb{
+      display:none;margin-top:12px;padding:11px 13px;
+      border-radius:12px;font-size:14px;line-height:1.55;
+    }
+    .fb.show{display:block}
+    .fb.ok{background:var(--ok);color:var(--ok-ink);border-left:4px solid var(--ok-line)}
+    .fb.err{background:var(--err);color:var(--err-ink);border-left:4px solid var(--err-line)}
+
+    /* GRAPH */
+    .graph-wrap{
+      background:#F8F6F1;border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;padding:12px;margin-bottom:14px;
+    }
+    .graph-line{stroke-dasharray:320;stroke-dashoffset:320;animation:drawLine 1.7s ease-out forwards}
+    .dot{opacity:0;transform-box:fill-box;transform-origin:center;animation:popIn .45s ease-out forwards}
+    .dot.d1{animation-delay:.2s}.dot.d2{animation-delay:.45s}.dot.d3{animation-delay:.7s}
+    .dot.d4{animation-delay:.95s}.dot.d5{animation-delay:1.2s}
+    .helper-line{stroke-dasharray:6 5;opacity:0;animation:fadeIn .5s ease forwards;animation-delay:1.55s}
+    .highlight-dot{opacity:0;animation:popIn .45s ease-out forwards;animation-delay:1.65s}
+    .focus-ring,.moving-point{opacity:0;animation:fadeIn .5s ease forwards;animation-delay:1.8s}
+    .moving-point{
+      opacity:1;offset-path:path('M 55 180 L 109 145 L 163 110');
+      offset-distance:0%;animation:movePoint 1.8s ease-in-out forwards;
+    }
+    .replay-btn{
+      display:inline-flex;align-items:center;gap:7px;
+      margin-top:8px;padding:8px 12px;font-size:13px;
+      border:1px solid rgba(0,0,0,.14);border-radius:10px;
+      background:#fff;cursor:pointer;font-family:inherit;
+    }
+    @keyframes drawLine{to{stroke-dashoffset:0}}
+    @keyframes popIn{0%{opacity:0;transform:scale(.35)} 70%{opacity:1;transform:scale(1.12)} 100%{opacity:1;transform:scale(1)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes movePoint{0%{offset-distance:0%;opacity:0} 8%{opacity:1} 100%{offset-distance:100%;opacity:1}}
+
+    /* SCORE CARD */
+    .score-card{
+      background:linear-gradient(180deg,#E9F2FB 0%,#F8FBFF 100%);
+      border:1px solid rgba(24,95,165,.25);
+      border-radius:18px;padding:24px 18px;
+      text-align:center;margin-top:24px;box-shadow:var(--shadow);
+    }
+    .score-num{font-size:52px;font-weight:800;color:var(--primary-dark);line-height:1;margin-bottom:6px}
+    .score-label{font-size:14px;color:var(--muted);margin-bottom:8px}
+    .score-msg{font-size:15px;color:var(--primary);margin-bottom:18px;line-height:1.55}
+    .score-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+    .sbtn{
+      padding:11px 20px;border-radius:12px;font-size:14px;
+      cursor:pointer;font-family:inherit;
+      transition:opacity .15s,transform .1s;
+    }
+    .sbtn:hover{opacity:.88}
+    .sbtn:active{transform:translateY(1px)}
+    .sbtn-primary{background:var(--primary);color:#fff;border:none}
+    .sbtn-secondary{background:transparent;border:1px solid rgba(0,0,0,.18);color:#222}
+    .sbtn-submit{background:#0C447C;color:#fff;border:none;font-size:15px;padding:14px 28px}
+    .sbtn-submit:disabled{opacity:.5;cursor:not-allowed}
+
+    /* SUBMIT STATUS */
+    .submit-status{
+      margin-top:14px;padding:12px 15px;border-radius:12px;
+      font-size:14px;line-height:1.5;display:none;
+    }
+    .submit-status.sending{background:#EEF5FF;color:#185FA5;border:1px solid rgba(24,95,165,.2)}
+    .submit-status.done{background:var(--ok);color:var(--ok-ink);border:1px solid var(--ok-line)}
+    .submit-status.fail{background:var(--err);color:var(--err-ink);border:1px solid var(--err-line)}
+    .submit-status.show{display:block}
+
+    .footer-note{text-align:center;font-size:12px;color:#999;margin-top:18px}
+    @media(max-width:600px){.wrap{padding:16px 11px 50px}.qtxt{font-size:15px}.obtn{font-size:14px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">Física · Recuperação 1º Bimestre</div>
+    <h1>Atividade interativa de revisão</h1>
+    <p>Resolva com calma. A atividade foi organizada em blocos curtos para facilitar a concentração e a interpretação.</p>
+    <div class="info-grid">
+      <div class="info-pill"><strong>Conteúdos:</strong> unidades, notação científica, gráfico e ordem de grandeza.</div>
+      <div class="info-pill"><strong>Dica:</strong> faça uma questão de cada vez.</div>
+      <div class="info-pill"><strong>Resultado:</strong> enviado automaticamente ao professor.</div>
+    </div>
+  </section>
+
+  <!-- IDENTIFICAÇÃO -->
+  <section class="panel">
+    <h2>Identificação</h2>
+    <div class="id-grid three">
+      <label>
+        <span>Nome completo</span>
+        <input type="text" id="inputNome" placeholder="Seu nome" autocomplete="name"/>
+      </label>
+      <label>
+        <span>Turma</span>
+        <input type="text" id="inputTurma" placeholder="Ex.: 1001"/>
+      </label>
+      <label>
+        <span>E-mail</span>
+        <input type="email" id="inputEmail" placeholder="seu@email.com" autocomplete="email"/>
+      </label>
+    </div>
+  </section>
+
+  <!-- INSTRUÇÕES -->
+  <section class="panel">
+    <h2>Antes de começar</h2>
+    <ul style="padding-left:18px;line-height:1.7;font-size:15px;color:#444">
+      <li>Leia devagar e marque apenas <strong>uma</strong> resposta por questão.</li>
+      <li>Se errar, veja o feedback — ele explica o raciocínio.</li>
+      <li>Ao terminar, clique em <strong>"Enviar resultado"</strong>.</li>
+    </ul>
+  </section>
+
+  <!-- PARTE 1 -->
+  <div class="sec-title">Parte 1 · Conversão de unidades</div>
+
+  <div class="qcard" id="q1">
+    <div class="qnum">1</div>
+    <div class="qtxt">1 km é igual a:</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q1','fb1',this,1)">100 m</button>
+      <button class="obtn" onclick="mc('q1','fb1',this,2)">1000 m</button>
+      <button class="obtn" onclick="mc('q1','fb1',this,3)">10.000 m</button>
+    </div>
+    <div class="fb" id="fb1"></div>
+  </div>
+
+  <div class="qcard" id="q2">
+    <div class="qnum">2</div>
+    <div class="qtxt">1 cm é igual a:</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q2','fb2',this,1)">1 m</button>
+      <button class="obtn" onclick="mc('q2','fb2',this,2)">0,01 m</button>
+      <button class="obtn" onclick="mc('q2','fb2',this,3)">0,1 m</button>
+    </div>
+    <div class="fb" id="fb2"></div>
+  </div>
+
+  <!-- PARTE 2 -->
+  <div class="sec-title">Parte 2 · Potências de 10</div>
+
+  <div class="qcard" id="q3">
+    <div class="qnum">3</div>
+    <div class="qtxt">1000 é igual a:</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q3','fb3',this,1)">10<sup>2</sup></button>
+      <button class="obtn" onclick="mc('q3','fb3',this,2)">10<sup>3</sup></button>
+      <button class="obtn" onclick="mc('q3','fb3',this,3)">10<sup>4</sup></button>
+    </div>
+    <div class="fb" id="fb3"></div>
+  </div>
+
+  <div class="qcard" id="q4">
+    <div class="qnum">4</div>
+    <div class="qtxt">0,001 é igual a:</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q4','fb4',this,1)">10<sup>−1</sup></button>
+      <button class="obtn" onclick="mc('q4','fb4',this,2)">10<sup>−2</sup></button>
+      <button class="obtn" onclick="mc('q4','fb4',this,3)">10<sup>−3</sup></button>
+    </div>
+    <div class="fb" id="fb4"></div>
+  </div>
+
+  <!-- PARTE 3 -->
+  <div class="sec-title">Parte 3 · Notação científica</div>
+
+  <div class="qcard" id="q5">
+    <div class="qnum">5</div>
+    <div class="qtxt">Qual é a notação científica de <strong>3000</strong>?</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q5','fb5',this,1)">3 × 10<sup>2</sup></button>
+      <button class="obtn" onclick="mc('q5','fb5',this,2)">3 × 10<sup>3</sup></button>
+      <button class="obtn" onclick="mc('q5','fb5',this,3)">30 × 10<sup>2</sup></button>
+    </div>
+    <div class="fb" id="fb5"></div>
+  </div>
+
+  <div class="qcard" id="q6">
+    <div class="qnum">6</div>
+    <div class="qtxt">Qual é a notação científica de <strong>0,0075</strong>?</div>
+    <div class="tip">Lembrete: na notação científica, o primeiro número deve ficar entre 1 e 10.</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q6','fb6',this,1)">7,5 × 10<sup>−2</sup></button>
+      <button class="obtn" onclick="mc('q6','fb6',this,2)">7,5 × 10<sup>−3</sup></button>
+      <button class="obtn" onclick="mc('q6','fb6',this,3)">75 × 10<sup>−4</sup></button>
+    </div>
+    <div class="fb" id="fb6"></div>
+  </div>
+
+  <!-- PARTE 4 -->
+  <div class="sec-title">Parte 4 · Leitura de gráfico</div>
+
+  <div class="qcard" id="q7">
+    <div class="qnum">7</div>
+    <div class="qtxt">O gráfico abaixo mostra a distância percorrida por um ciclista ao longo do tempo:</div>
+    <div class="graph-wrap">
+      <svg id="bikeGraph" viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block" aria-label="Gráfico da distância percorrida por um ciclista em função do tempo">
+        <defs>
+          <marker id="arrowX2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 1,7 4,0 7" fill="#333"/></marker>
+          <marker id="arrowY2" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto"><polygon points="1 7,4 0,7 7" fill="#333"/></marker>
+        </defs>
+        <rect x="0" y="0" width="360" height="230" fill="#fff" rx="12"/>
+        <g stroke="#D9D9D9" stroke-width="1">
+          <line x1="55" y1="180" x2="325" y2="180"/>
+          <line x1="55" y1="145" x2="325" y2="145"/>
+          <line x1="55" y1="110" x2="325" y2="110"/>
+          <line x1="55" y1="75" x2="325" y2="75"/>
+          <line x1="55" y1="40" x2="325" y2="40"/>
+        </g>
+        <g stroke="#E6E6E6" stroke-width="1">
+          <line x1="55" y1="25" x2="55" y2="180"/>
+          <line x1="109" y1="25" x2="109" y2="180"/>
+          <line x1="163" y1="25" x2="163" y2="180"/>
+          <line x1="217" y1="25" x2="217" y2="180"/>
+          <line x1="271" y1="25" x2="271" y2="180"/>
+          <line x1="325" y1="25" x2="325" y2="180"/>
+        </g>
+        <line x1="55" y1="180" x2="335" y2="180" stroke="#333" stroke-width="2" marker-end="url(#arrowX2)"/>
+        <line x1="55" y1="180" x2="55" y2="18" stroke="#333" stroke-width="2" marker-end="url(#arrowY2)"/>
+        <g font-size="11" fill="#555" text-anchor="end">
+          <text x="48" y="184">0</text><text x="48" y="149">10</text>
+          <text x="48" y="114">20</text><text x="48" y="79">30</text><text x="48" y="44">40</text>
+        </g>
+        <g font-size="11" fill="#555" text-anchor="middle">
+          <text x="55" y="196">0</text><text x="109" y="196">1</text>
+          <text x="163" y="196">2</text><text x="217" y="196">3</text>
+          <text x="271" y="196">4</text><text x="325" y="196">5</text>
+        </g>
+        <text x="190" y="215" text-anchor="middle" font-size="12" font-weight="700" fill="#333">Tempo (h)</text>
+        <text x="16" y="104" text-anchor="middle" font-size="12" font-weight="700" fill="#333" transform="rotate(-90,16,104)">Distância (km)</text>
+        <text x="190" y="16" text-anchor="middle" font-size="13" font-weight="700" fill="#0C447C">Distância percorrida por um ciclista</text>
+        <polyline class="graph-line" points="55,180 109,145 163,110 217,75 271,40" fill="none" stroke="#185FA5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <g fill="#185FA5" stroke="#fff" stroke-width="2.5">
+          <circle class="dot d1" cx="55" cy="180" r="5.5"/>
+          <circle class="dot d2" cx="109" cy="145" r="5.5"/>
+          <circle class="dot d3" cx="163" cy="110" r="5.5"/>
+          <circle class="dot d4" cx="217" cy="75" r="5.5"/>
+          <circle class="dot d5" cx="271" cy="40" r="5.5"/>
+        </g>
+        <line class="helper-line" x1="163" y1="180" x2="163" y2="110" stroke="#BA7517" stroke-width="2"/>
+        <line class="helper-line" x1="55" y1="110" x2="163" y2="110" stroke="#BA7517" stroke-width="2"/>
+        <circle class="highlight-dot" cx="163" cy="110" r="7.5" fill="#BA7517" stroke="#fff" stroke-width="2.5"/>
+        <circle class="focus-ring" cx="163" cy="110" r="13" fill="none" stroke="#BA7517" stroke-width="2" stroke-opacity=".35"/>
+        <circle class="moving-point" r="5.5" fill="#0C447C"/>
+      </svg>
+      <div style="font-size:12px;color:#666;text-align:center;margin-top:6px">Cada 1 hora corresponde a 10 km percorridos.</div>
+    </div>
+    <button class="replay-btn" type="button" onclick="restartGraph()">▶ Repetir animação</button>
+    <div style="height:12px"></div>
+    <div class="qtxt">Com base no gráfico, qual é a distância percorrida em <strong>2 horas</strong>?</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q7','fb7',this,1)">10 km</button>
+      <button class="obtn" onclick="mc('q7','fb7',this,2)">20 km</button>
+      <button class="obtn" onclick="mc('q7','fb7',this,3)">30 km</button>
+      <button class="obtn" onclick="mc('q7','fb7',this,4)">40 km</button>
+    </div>
+    <div class="fb" id="fb7"></div>
+  </div>
+
+  <div class="qcard" id="q8">
+    <div class="qnum">8</div>
+    <div class="qtxt">Observando o mesmo gráfico: ele é uma <strong>reta</strong> ou uma <strong>curva</strong>? Isso mostra que a velocidade do ciclista é:</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q8','fb8',this,1)">É uma curva — a velocidade muda o tempo todo</button>
+      <button class="obtn" onclick="mc('q8','fb8',this,2)">É uma reta — a velocidade é constante</button>
+      <button class="obtn" onclick="mc('q8','fb8',this,3)">É uma reta — a velocidade aumenta com o tempo</button>
+    </div>
+    <div class="fb" id="fb8"></div>
+  </div>
+
+  <!-- PARTE 5 -->
+  <div class="sec-title">Parte 5 · Ordem de grandeza</div>
+
+  <div class="qcard" id="q9">
+    <div class="qnum">9</div>
+    <div class="qtxt">O comprimento de uma sala é <strong>8 m</strong>. Qual é a ordem de grandeza?</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q9','fb9',this,1)">10<sup>0</sup> m</button>
+      <button class="obtn" onclick="mc('q9','fb9',this,2)">10<sup>1</sup> m</button>
+      <button class="obtn" onclick="mc('q9','fb9',this,3)">10<sup>2</sup> m</button>
+    </div>
+    <div class="fb" id="fb9"></div>
+  </div>
+
+  <div class="qcard" id="q10">
+    <div class="qnum">10</div>
+    <div class="qtxt">A espessura de uma folha de papel é <strong>10<sup>−4</sup> m</strong>. Qual é a ordem de grandeza?</div>
+    <div class="opts">
+      <button class="obtn" onclick="mc('q10','fb10',this,1)">10<sup>−4</sup> m</button>
+      <button class="obtn" onclick="mc('q10','fb10',this,2)">10<sup>−2</sup> m</button>
+      <button class="obtn" onclick="mc('q10','fb10',this,3)">10<sup>1</sup> m</button>
+    </div>
+    <div class="fb" id="fb10"></div>
+  </div>
+
+  <!-- RESULTADO + ENVIO -->
+  <section class="score-card" id="scoreBox">
+    <div class="score-num"><span id="scoreNow">0</span>/10</div>
+    <div class="score-label">questões corretas</div>
+    <div class="score-msg" id="scoreMsg">Resolva as questões para ver seu resultado.</div>
+    <div class="score-btns">
+      <button class="sbtn sbtn-secondary" type="button" onclick="resetQuiz()">Recomeçar</button>
+      <button class="sbtn sbtn-submit" type="button" id="btnEnviar" onclick="enviarResultado()">Enviar resultado ao professor</button>
+    </div>
+    <div class="submit-status" id="submitStatus"></div>
+  </section>
+
+  <p class="footer-note">CTUR · UFRRJ · Física — Recuperação 1º Bimestre</p>
+
+</main>
+
+<script>
+  // ─── CONFIGURAÇÃO ────────────────────────────────────────────────
+  // Cole aqui a URL gerada pelo Apps Script (passo 2 do tutorial)
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxkJ1OiTGyECImDm1S7hCbiJZi4ViYFqo1CVuCWjb1RhOGZdXRt3VmlQoBNbSH1YHRu/exec";
+  // ─────────────────────────────────────────────────────────────────
+
+  const answerKey = {q1:2,q2:2,q3:2,q4:3,q5:2,q6:2,q7:2,q8:2,q9:2,q10:1};
+
+  const feedbacks = {
+    q1:{ok:'Correto. 1 quilômetro corresponde a 1000 metros.',err:'Revise a relação entre km e m. Em 1 km cabem 1000 metros.'},
+    q2:{ok:'Muito bem. 1 cm é a centésima parte do metro: 0,01 m.',err:'Lembre: 100 cm = 1 m. Então 1 cm = 0,01 m.'},
+    q3:{ok:'Certo. 1000 = 10³.',err:'Conte os zeros: 1000 tem três zeros, então é 10³.'},
+    q4:{ok:'Isso mesmo. 0,001 = 10⁻³.',err:'Quando o número é pequeno, o expoente é negativo. Aqui são três casas.'},
+    q5:{ok:'Correto. 3000 = 3 × 10³.',err:'Na notação científica, o primeiro número deve ficar entre 1 e 10.'},
+    q6:{ok:'Perfeito. 0,0075 = 7,5 × 10⁻³.',err:'Desloque a vírgula três casas para a direita. Por isso o expoente é −3.'},
+    q7:{ok:'Correto. Em 2 horas, o gráfico marca 20 km.',err:'Use as linhas destacadas: o ponto de 2 horas encontra a distância de 20 km.'},
+    q8:{ok:'Muito bem. Uma reta indica velocidade constante.',err:'Observe o formato da linha: ela é reta, então a velocidade permanece constante.'},
+    q9:{ok:'Certo. 8 m está mais próximo de 10 m, que é 10¹ m.',err:'Compare 8 m com 1 m, 10 m e 100 m. Ele fica mais próximo de 10 m.'},
+    q10:{ok:'Correto. A ordem de grandeza é 10⁻⁴ m.',err:'O enunciado já informa o valor em potência de 10: 10⁻⁴ m.'}
+  };
+
+  // Rótulos legíveis para cada questão (aparece na planilha)
+  const qLabels = {
+    q1:'Q1 – 1km em metros',
+    q2:'Q2 – 1cm em metros',
+    q3:'Q3 – 1000 em potência',
+    q4:'Q4 – 0,001 em potência',
+    q5:'Q5 – Not. cient. 3000',
+    q6:'Q6 – Not. cient. 0,0075',
+    q7:'Q7 – Gráfico 2h',
+    q8:'Q8 – Gráfico tipo',
+    q9:'Q9 – OG sala',
+    q10:'Q10 – OG folha papel'
+  };
+
+  const state = {};
+
+  function disableQuestion(card){
+    card.querySelectorAll('.obtn').forEach(b => b.disabled = true);
+  }
+
+  function showCorrect(cardId){
+    const card = document.getElementById(cardId);
+    const buttons = [...card.querySelectorAll('.obtn')];
+    const ri = answerKey[cardId]-1;
+    if(buttons[ri] && !buttons[ri].classList.contains('ok'))
+      buttons[ri].classList.add('show-correct');
+  }
+
+  function mc(cardId, fbId, btn, chosen){
+    if(state[cardId] !== undefined) return;
+    const card = document.getElementById(cardId);
+    const fb = document.getElementById(fbId);
+    const correct = answerKey[cardId];
+    const isRight = chosen === correct;
+    state[cardId] = {chosen, isRight};
+
+    btn.classList.add(isRight ? 'ok' : 'err');
+    card.classList.add(isRight ? 'ok' : 'err');
+    fb.className = 'fb show ' + (isRight ? 'ok' : 'err');
+    fb.innerHTML = isRight ? feedbacks[cardId].ok : feedbacks[cardId].err;
+
+    if(!isRight) showCorrect(cardId);
+    disableQuestion(card);
+    updateScore();
+  }
+
+  function updateScore(){
+    const total = Object.keys(answerKey).length;
+    const answered = Object.keys(state).length;
+    const points = Object.values(state).filter(s => s.isRight).length;
+    document.getElementById('scoreNow').textContent = points;
+
+    let msg = 'Resolva as questões para ver seu resultado.';
+    if(answered > 0 && answered < total)
+      msg = `Você já respondeu ${answered} de ${total} questões. Continue.`;
+    if(answered === total){
+      if(points <= 4) msg = 'Você terminou. Vale revisar os feedbacks e tentar novamente depois.';
+      else if(points <= 7) msg = 'Bom trabalho. Você já domina uma boa parte do conteúdo.';
+      else msg = 'Ótimo resultado. Você mostrou boa compreensão dos temas revisados.';
+    }
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function resetQuiz(){
+    for(const k of Object.keys(state)) delete state[k];
+    document.querySelectorAll('.qcard').forEach(card => {
+      card.classList.remove('ok','err');
+      card.querySelectorAll('.obtn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('ok','err','show-correct');
+      });
+    });
+    document.querySelectorAll('.fb').forEach(fb => { fb.className='fb'; fb.innerHTML=''; });
+    const st = document.getElementById('submitStatus');
+    st.className = 'submit-status'; st.innerHTML = '';
+    document.getElementById('btnEnviar').disabled = false;
+    updateScore();
+    restartGraph();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function restartGraph(){
+    const svg = document.getElementById('bikeGraph');
+    if(!svg) return;
+    svg.querySelectorAll('.graph-line,.dot,.helper-line,.highlight-dot,.focus-ring,.moving-point')
+      .forEach(el => { el.style.animation='none'; void el.getBoundingClientRect(); el.style.animation=''; });
+  }
+
+  async function enviarResultado(){
+    const nome = document.getElementById('inputNome').value.trim();
+    const turma = document.getElementById('inputTurma').value.trim();
+    const email = document.getElementById('inputEmail').value.trim();
+
+    // Validação
+    let ok = true;
+    ['inputNome','inputTurma','inputEmail'].forEach(id => {
+      const el = document.getElementById(id);
+      if(!el.value.trim()){ el.classList.add('error'); ok = false; }
+      else el.classList.remove('error');
+    });
+    if(!ok){ alert('Preencha Nome, Turma e E-mail antes de enviar.'); return; }
+
+    const total = Object.keys(answerKey).length;
+    const answered = Object.keys(state).length;
+    if(answered < total){
+      if(!confirm(`Você respondeu ${answered} de ${total} questões. Deseja enviar mesmo assim?`)) return;
+    }
+
+    const btn = document.getElementById('btnEnviar');
+    const st = document.getElementById('submitStatus');
+    btn.disabled = true;
+    st.className = 'submit-status sending show';
+    st.innerHTML = '⏳ Enviando… aguarde.';
+
+    const points = Object.values(state).filter(s => s.isRight).length;
+
+    // Monta payload
+    const payload = {
+      timestamp: new Date().toLocaleString('pt-BR'),
+      nome, turma, email,
+      nota: points,
+      total,
+      percentual: Math.round(points/total*100)
+    };
+    // Adiciona resposta e acerto de cada questão
+    for(const [qid, data] of Object.entries(state)){
+      payload['resp_' + qid] = data.chosen;
+      payload['ok_' + qid] = data.isRight ? 1 : 0;
+    }
+    // Questões não respondidas
+    for(const qid of Object.keys(answerKey)){
+      if(!state[qid]){
+        payload['resp_' + qid] = '';
+        payload['ok_' + qid] = '';
+      }
+    }
+
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      st.className = 'submit-status done show';
+      st.innerHTML = `✅ Resultado enviado com sucesso!<br>
+        <strong>${nome}</strong> · Turma ${turma} · Nota: ${points}/${total} (${payload.percentual}%)`;
+    } catch(e) {
+      st.className = 'submit-status fail show';
+      st.innerHTML = '❌ Falha no envio. Verifique sua conexão e tente novamente.';
+      btn.disabled = false;
+    }
+  }
+
+  updateScore();
+</script>
+</body>
+</html>
